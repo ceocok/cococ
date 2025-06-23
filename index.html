@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>cococ.co</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: rgb(8, 5, 16);
+            color: #fefeff;
+            font-family: 'Arial', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-smoothing: antialiased;
+            touch-action: none;
+        }
+        
+        #container {
+            display: table;
+            position: absolute;
+            z-index: 20;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            cursor: none;
+        }
+        
+        #container > div {
+            display: table-cell;
+            vertical-align: middle;
+        }
+        
+        h1 {
+            font-size: 4em;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 0 25px rgba(254, 254, 255, 0.85);
+            visibility: hidden;
+        }
+        
+        h2 {
+            font-size: 2em;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 0 25px rgba(254, 254, 255, 0.85);
+            margin-top: 20px;
+            visibility: hidden;
+        }
+        
+        [class^="letter"] {
+            -webkit-transition: opacity 3s ease;
+            -moz-transition: opacity 3s ease;
+            transition: opacity 3s ease;
+            opacity: 0;
+        }
+        
+        .letter-0 { transition-delay: 0.2s; }
+        .letter-1 { transition-delay: 0.4s; }
+        .letter-2 { transition-delay: 0.6s; }
+        .letter-3 { transition-delay: 0.8s; }
+        .letter-4 { transition-delay: 1.0s; }
+        .letter-5 { transition-delay: 1.2s; }
+        .letter-6 { transition-delay: 1.4s; }
+        .letter-7 { transition-delay: 1.6s; }
+        .letter-8 { transition-delay: 1.8s; }
+        .letter-9 { transition-delay: 2.0s; }
+        .letter-10 { transition-delay: 2.2s; }
+        .letter-11 { transition-delay: 2.4s; }
+        .letter-12 { transition-delay: 2.6s; }
+        .letter-13 { transition-delay: 2.8s; }
+        .letter-14 { transition-delay: 3.0s; }
+        
+        h1.transition-in, h2.transition-in {
+            visibility: visible;
+        }
+        
+        h1.transition-in [class^="letter"], 
+        h2.transition-in [class^="letter"] {
+            opacity: 1;
+        }
+        
+        #container p {
+            margin-top: 30px;
+        }
+        
+        #container p strong {
+            color: #b3abc5;
+            font-size: 1.5em;
+        }
+        
+        #container p strong a {
+            color: #b3abc5;
+            text-decoration: none;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+        
+        /* 添加的logo样式 */
+        h1::before {
+            content: "";
+            display: inline-block;
+            vertical-align: middle;
+            width: 68px;
+            height: 68px;
+            background-image: url("https://c.cococ.co/logot.png");
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: left center, right center;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 3em; }
+            h2 { font-size: 1.5em; }
+            h1::before {
+                width: 48px;
+                height: 48px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.2em; }
+            #container p strong { font-size: 1.2em; }
+            h1::before {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div>
+            <h1 id="h1">cococ.co</h1>
+            <h2 id="h2">Contact Me</h2>
+            <p><strong>Email: <a href="mailto:ceocok@gmail.com">ceocok@gmail.com</a></strong></p>
+        </div>
+    </div>
+    
+    <canvas id="canvas"></canvas>
+    
+    <script>
+    // 禁止F12和其他开发者工具快捷键
+    document.onkeydown = function(e) {
+        // F12键
+        if(e.keyCode == 123) {
+            return false;
+        }
+        
+        // Ctrl+Shift+I
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+            return false;
+        }
+        
+        // Ctrl+Shift+J
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+            return false;
+        }
+        
+        // Ctrl+Shift+C
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 67) {
+            return false;
+        }
+        
+        // Ctrl+U (查看源代码)
+        if(e.ctrlKey && e.keyCode == 85) {
+            return false;
+        }
+    };
+        
+    // 禁止右键菜单
+    document.oncontextmenu = function() {
+        return false;
+    };
+        
+    // 文字动画效果
+    function letterAnimation() {
+        // 为h1添加字母span
+        var h1 = document.getElementById('h1');
+        var h2 = document.getElementById('h2');
+        
+        var h1Text = h1.textContent;
+        var h2Text = h2.textContent;
+        
+        h1.innerHTML = '';
+        h2.innerHTML = '';
+        
+        // 为每个字母创建span
+        for (var i = 0; i < h1Text.length; i++) {
+            var letter = document.createElement('span');
+            letter.className = 'letter-' + i;
+            letter.textContent = h1Text.charAt(i);
+            h1.appendChild(letter);
+        }
+        
+        for (var i = 0; i < h2Text.length; i++) {
+            var letter = document.createElement('span');
+            letter.className = 'letter-' + i;
+            letter.textContent = h2Text.charAt(i);
+            h2.appendChild(letter);
+        }
+        
+        // 添加transition-in类以触发动画
+        setTimeout(function() {
+            h1.className = 'transition-in';
+            h2.className = 'transition-in';
+        }, 500);
+    }
+        
+    // 禁止缩放
+    document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+        
+    // 主动画代码
+    (function() {
+        var canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext('2d');
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var target = { x: width / 2, y: height / 2 };
+        var tendrils = [];
+        var hue = 0;
+        
+        // 设置
+        var settings = {
+            friction: 0.5,
+            trails: 20,
+            size: 50,
+            dampening: 0.25,
+            tension: 0.98
+        };
+        
+        // 节点构造函数
+        function Node() {
+            this.x = 0;
+            this.y = 0;
+            this.vx = 0;
+            this.vy = 0;
+        }
+        
+        // 卷须构造函数
+        function Tendril(options) {
+            this.spring = options.spring + (Math.random() * 0.1) - 0.05;
+            this.friction = settings.friction + (Math.random() * 0.01) - 0.005;
+            this.nodes = [];
+            
+            for (var i = 0; i < settings.size; i++) {
+                var node = new Node();
+                node.x = target.x;
+                node.y = target.y;
+                this.nodes.push(node);
+            }
+        }
+        
+        // 卷须更新方法
+        Tendril.prototype.update = function() {
+            var spring = this.spring;
+            var node = this.nodes[0];
+            
+            node.vx += (target.x - node.x) * spring;
+            node.vy += (target.y - node.y) * spring;
+            
+            for (var i = 0; i < this.nodes.length; i++) {
+                node = this.nodes[i];
+                
+                if (i > 0) {
+                    var prev = this.nodes[i - 1];
+                    node.vx += (prev.x - node.x) * spring;
+                    node.vy += (prev.y - node.y) * spring;
+                    node.vx += prev.vx * settings.dampening;
+                    node.vy += prev.vy * settings.dampening;
+                }
+                
+                node.vx *= this.friction;
+                node.vy *= this.friction;
+                node.x += node.vx;
+                node.y += node.vy;
+                
+                spring *= settings.tension;
+            }
+        };
+        
+        // 卷须绘制方法
+        Tendril.prototype.draw = function() {
+            var x = this.nodes[0].x;
+            var y = this.nodes[0].y;
+            var a, b;
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            
+            for (var i = 1; i < this.nodes.length - 2; i++) {
+                a = this.nodes[i];
+                b = this.nodes[i + 1];
+                x = (a.x + b.x) * 0.5;
+                y = (a.y + b.y) * 0.5;
+                
+                ctx.quadraticCurveTo(a.x, a.y, x, y);
+            }
+            
+            a = this.nodes[i];
+            b = this.nodes[i + 1];
+            
+            ctx.quadraticCurveTo(a.x, a.y, b.x, b.y);
+            ctx.stroke();
+            ctx.closePath();
+        };
+        
+        // 初始化
+        function init() {
+            canvas.width = width;
+            canvas.height = height;
+            
+            // 创建卷须
+            for (var i = 0; i < settings.trails; i++) {
+                tendrils.push(new Tendril({
+                    spring: 0.45 + 0.025 * (i / settings.trails)
+                }));
+            }
+            
+            // 启动文字动画
+            letterAnimation();
+            
+            // 开始动画循环
+            animate();
+        }
+        
+        // 动画循环
+        function animate() {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = 'rgba(8, 5, 16, 0.4)';
+            ctx.fillRect(0, 0, width, height);
+            ctx.globalCompositeOperation = 'lighter';
+            ctx.strokeStyle = 'hsla(' + hue + ',90%,50%,0.25)';
+            ctx.lineWidth = 1;
+            
+            for (var i = 0; i < tendrils.length; i++) {
+                tendrils[i].update();
+                tendrils[i].draw();
+            }
+            
+            // 更新色相
+            hue = (hue + 0.5) % 360;
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // 鼠标/触摸移动事件处理
+        function mousemove(e) {
+            if (e.touches) {
+                target.x = e.touches[0].clientX;
+                target.y = e.touches[0].clientY;
+            } else {
+                target.x = e.clientX;
+                target.y = e.clientY;
+            }
+            e.preventDefault();
+        }
+        
+        // 窗口大小调整
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        
+        // 事件监听
+        document.addEventListener('mousemove', mousemove);
+        document.addEventListener('touchmove', mousemove);
+        document.addEventListener('touchstart', mousemove);
+        window.addEventListener('resize', resize);
+        
+        // 启动
+        init();
+    })();
+    </script>
+</body>
+</html>
